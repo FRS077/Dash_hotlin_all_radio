@@ -22,7 +22,7 @@
  * Index page
  */
 
-$pages = array("wifi", "svx", "sa", "log", "nod", "aprs", "tty", "cfg", "update");
+$pages = array("wifi", "svx", "sa", "log", "nod", "aprs", "tty", "cfg");
 $page  = (null !== filter_input(INPUT_GET, 'p', FILTER_SANITIZE_SPECIAL_CHARS)) ? $_GET['p'] : '';
 
 // Common functions
@@ -80,44 +80,6 @@ switch ($page) {
     case "cfg":
         $htmlOutput = cfgForm();
         break;
-
-    // === PAGE DE MISE À JOUR ===
-    case "update":
-        $output = [];
-        $return = 0;
-
-        // Optionnel : restreindre l’accès (IP, session, etc.)
-        // if (!est_admin()) { die('Accès refusé'); }
-
-        exec('sudo /usr/local/bin/update_dash_html.sh 2>&1', $output, $return);
-
-        $log = implode("\n", $output);
-
-        $htmlOutput = '<h4 class="m-2 mt-2 alert alert-info fw-bold">🔄 Mise à jour du dashboard</h4>
-        <div class="card m-2">
-            <div class="card-body">';
-
-        if ($return === 0) {
-            $htmlOutput .= '<div class="alert alert-success">Mise à jour terminée avec succès.</div>';
-        } else {
-            $htmlOutput .= '<div class="alert alert-danger">Erreur lors de la mise à jour (code ' .
-                htmlspecialchars((string)$return) . ').</div>';
-        }
-
-        $htmlOutput .= '<pre class="bg-dark text-light p-3 rounded" style="max-height:400px;overflow:auto;">' .
-            htmlspecialchars($log) .
-            '</pre>';
-
-        $htmlOutput .= '<div class="d-grid gap-2 col-6 mx-auto">
-            <a href="./" class="btn btn-primary btn-lg">Retour à l’accueil</a>
-        </div>
-        </div>
-        </div>';
-
-        // Pas de JS spécial ici
-        $ajax = null;
-        break;
-
     default:
         $svxAction  = (getSVXLinkStatus(1)) ? 'Restart' : 'Start';
         $htmlOutput = '<h4 class="m-2 mt-2 alert alert-success fw-bold talker">' . ($detect->isMobile() ? '&nbsp;' : 'Statut') . '<span id="onair" class="badge position-absolute top-50 start-50 translate-middle"></span></h4>
@@ -218,7 +180,6 @@ switch ($page) {
                     <a class="<?php echo ($page == 'log') ? 'active' : ''; ?> list-group-item list-group-item-action list-group-item-light p-3" href="./?p=log">📋 Logs</a>
                     <a class="<?php echo ($page == 'tty') ? 'active' : ''; ?> list-group-item list-group-item-action list-group-item-light p-3" href="./?p=tty">💻 Terminal</a>
                     <a class="<?php echo ($page == 'cfg') ? 'active' : ''; ?> list-group-item list-group-item-action list-group-item-light p-3" href="./?p=cfg">⚙️ Config</a>
-                    <a class="<?php echo ($page == 'update') ? 'active' : ''; ?> list-group-item list-group-item-action list-group-item-light p-3" href="./?p=update">🔄 Mise à jour</a>
                     <a class="<?php echo ($page == 'nod') ? 'active' : ''; ?> list-group-item list-group-item-action list-group-item-light p-3" href="./?p=nod">ℹ️ Node Info</a>
                     <a class="<?php echo ($page == 'ext') ? 'active' : ''; ?> list-group-item list-group-item-action list-group-item-light p-3" href="https://www.f62dmr.fr/index.php" target="_blank">🌐 Dashboard RNFA</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="https://www.facebook.com/groups/1067389751809869" target="_blank">📘 Groupe Facebook</a>
@@ -250,7 +211,6 @@ switch ($page) {
                                 <li class="nav-item"><a class="<?php echo ($page == 'log') ? 'active p-2' : ''; ?> nav-link" href="./?p=log">📋 Logs</a></li>
                                 <li class="nav-item"><a class="<?php echo ($page == 'tty') ? 'active p-2' : ''; ?> nav-link" href="./?p=tty">💻 Terminal</a></li>
                                 <li class="nav-item"><a class="<?php echo ($page == 'cfg') ? 'active p-2' : ''; ?> nav-link" href="./?p=cfg">⚙️ Config</a></li>
-                                <li class="nav-item"><a class="<?php echo ($page == 'update') ? 'active p-2' : ''; ?> nav-link" href="./?p=update">🔄 Mise à jour</a></li>
                                 <li class="nav-item"><a class="<?php echo ($page == 'nod') ? 'active p-2' : ''; ?> nav-link" href="./?p=nod">ℹ️ Node Info</a></li>
                                 <li class="nav-item"><a class="nav-link p-2" href="https://www.f62dmr.fr/index.php" target="_blank">🌐 Dashboard du RNFA</a></li>
                                 <li class="nav-item"><a class="nav-link p-2" href="https://www.facebook.com/groups/1067389751809869" target="_blank">📘 Groupe Facebook</a></li>
