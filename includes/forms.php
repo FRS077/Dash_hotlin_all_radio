@@ -271,7 +271,7 @@ function svxForm()
 
     global $cfgFile, $config, $pinsArray, $cfgRefFile;
     $svxPinsArray = array();
-    $saDetect     = sa8x8Detect();
+    //$saDetect     = sa8x8Detect();
     /* Convert pins to both states (normal/inverted) */
     foreach ($pinsArray as $pin) {
         $svxPinsArray[] = 'gpio' . $pin;
@@ -405,7 +405,7 @@ function svxForm()
         </div>
         <div id="auth_key" class="input-group input-group-sm mb-1">
           <span class="input-group-text" style="width: 8rem;">Passwd</span>
-          <input id="svx_key" type="password" class="form-control" placeholder="nod_portabil" aria-label="Auth Key" aria-describedby="inputGroup-sizing-sm" ' . $authKeyValue . '>
+          <input id="svx_key" type="password" class="form-control" placeholder="Node_Radio" aria-label="Auth Key" aria-describedby="inputGroup-sizing-sm" ' . $authKeyValue . '>
           <button id="show_hide" class="input-group-text" role="button"><i class="icon-visibility" aria-hidden="true"></i></button>
         </div>
         <div class="input-group input-group-sm mb-1">
@@ -607,7 +607,7 @@ function echoLinkForm()
     preg_match('/(#?)PROXY_PASSWORD=(\S+)/', $echoLinkData, $elProxyPassword);
     $echoLinkForm = '<div class="input-group input-group-sm mb-1">
           <span class="input-group-text" style="width: 8rem;">Indicatif</span>
-          <input id="svx_el_cal" type="text" class="form-control" placeholder="YO1XYZ" aria-label="Callsign" aria-describedby="inputGroup-sizing-sm" value=' . $elCallSign[1] . '>
+          <input id="svx_el_cal" type="text" class="form-control" placeholder="FRS000" aria-label="Callsign" aria-describedby="inputGroup-sizing-sm" value=' . $elCallSign[1] . '>
         </div>
         <div class="input-group input-group-sm mb-1">
           <span class="input-group-text" style="width: 8rem;">Password</span>
@@ -653,216 +653,6 @@ function echoLinkForm()
     return $echoLinkForm;
 }
 
-/* SA818 radio */
-function sa818Form()
-{
-    $env = checkEnvironment();
-    if ($env) {
-        return $env;
-    }
-
-    global $cfgFile, $config;
-    $historyFile = dirname(__FILE__) . '/../profiles/sa818pgm.log';
-    // Last programmed details
-    $lastPgmData = array(
-        "date"      => null,
-        "frequency" => null,
-        "deviation" => null,
-        "ctcssRx"   => null,
-        "ctcssTx"   => null,
-        "squelch"   => null,
-        "volume"    => null,
-        "filter"    => null,
-    );
-    if (is_file($historyFile)) {
-        $lastPgmData = json_decode(file_get_contents($historyFile), true);
-    }
-    $ctcssVars = [
-        "0"  => "Aucune", "1"   => "67.0", "2"   => "71.9", "3"   => "74.4", "4"  => "77.0", "5" => "79.7",
-        "6"  => "82.5", "7"   => "85.4", "8"   => "88.5", "9"   => "91.5", "10" => "94.8",
-        "11" => "97.4", "12"  => "100.0", "13" => "103.5", "14" => "107.2",
-        "15" => "110.9", "16" => "114.8", "17" => "118.8", "18" => "123",
-        "19" => "127.3", "20" => "131.8", "21" => "136.5", "22" => "141.3",
-        "23" => "146.2", "24" => "151.4", "25" => "156.7", "26" => "162.2",
-        "27" => "167.9", "28" => "173.8", "29" => "179.9", "30" => "186.2",
-        "31" => "192.8", "32" => "203.5", "33" => "210.7", "34" => "218.1",
-        "35" => "225.7", "36" => "233.6", "37" => "241.8", "38" => "250.3",
-    ];
-    $filterOptions = [
-        ''      => 'Aucun changement',
-        '0,0,0' => 'Désactiver tout (par défaut)',
-        '1,0,0' => 'Enable Pre/De-Emphasis',
-        '0,1,0' => 'Enable High Pass',
-        '0,0,1' => 'Enable Low Pass',
-        '0,1,1' => 'Enable Low Pass & High Pass',
-        '1,1,0' => 'Enable Pre/De-Emphasis & High Pass',
-        '1,0,1' => 'Enable Pre/De-Emphasis & Low Pass',
-        '1,1,1' => 'Enable All',
-    ];
-$sa818Form = '<h4 class="mt-2 alert alert-danger fw-bold">Programmation du SA818 ou SA868</h4>
-    <div class="card mb-2">
-        <h4 class="card-header fs-5">Fréquence</h4>
-        <div class="card-body">
-            <div class="form-floating mb-1">
-                <select id="sa_grp" class="form-select" aria-label="Fréquence (MHz)">
-                <option selected disabled>Sélectionnez une valeur</option>
-				<optgroup label="------- PMR446 (pas 12.5 kHz) -------">';
-    for ($f = 446.00625 ; $f <= 446.19375; $f += 0.0125) {
-    // format avec 4 décimales
-    $freqFmt = number_format($f, 5, ',', ''); 
-    // ajout de l’unité MHz
-    $freqFmt .= ' MHz';
-
-    // construction des <option>
-    $sa818Form .= '<option ' 
-        . (($lastPgmData['frequency'] == sprintf("%0.4f", $f)) ? 'selected' : '') 
-        . ' value="' . sprintf("%0.4f", $f) . '">' 
-        . $freqFmt 
-        . '</option>' . PHP_EOL;
-}
-
-$sa818Form .= '</optgroup>
-                <option disabled hidden>&nbsp;</option> 
-                <optgroup label="------- RELAIS 446.200 -------">';
-    for ($f = 446.200 ; $f <= 446.200; $f += 0.0125) {
-    // format avec 4 décimales
-    $freqFmt = number_format($f, 5, ',', ''); 
-    // ajout de l’unité MHz
-    $freqFmt .= ' MHz';
-
-    // construction des <option>
-    $sa818Form .= '<option ' 
-        . (($lastPgmData['frequency'] == sprintf("%0.4f", $f)) ? 'selected' : '') 
-        . ' value="' . sprintf("%0.4f", $f) . '">' 
-        . $freqFmt 
-        . '</option>' . PHP_EOL;
-    }
-	
-$sa818Form .= '</optgroup>
-                <option disabled hidden>&nbsp;</option> 
-                <optgroup label="------- UHF 430 - 440 MHz (pas 12.5 kHz) -------">';
-    for ($f = 430 ; $f <= 440; $f += 0.0125) {
-    // format avec 4 décimales
-    $freqFmt = number_format($f, 5, ',', ''); 
-    // ajout de l’unité MHz
-    $freqFmt .= ' MHz';
-	
-	// construction des <option>
-    $sa818Form .= '<option ' 
-        . (($lastPgmData['frequency'] == sprintf("%0.4f", $f)) ? 'selected' : '') 
-        . ' value="' . sprintf("%0.4f", $f) . '">' 
-        . $freqFmt 
-        . '</option>' . PHP_EOL;
-    }
-	
-$sa818Form .= '</optgroup>
-                <option disabled hidden>&nbsp;</option> 
-                <optgroup label="------- VHF 144 - 146 MHz (pas 12.5 kHz) -------">';
-    for ($f = 144 ; $f <= 146; $f += 0.0125) {
-    // format avec 4 décimales
-    $freqFmt = number_format($f, 5, ',', ''); 
-    // ajout de l’unité MHz
-    $freqFmt .= ' MHz';
-
-    // construction des <option>
-    $sa818Form .= '<option ' 
-        . (($lastPgmData['frequency'] == sprintf("%0.4f", $f)) ? 'selected' : '') 
-        . ' value="' . sprintf("%0.4f", $f) . '">' 
-        . $freqFmt 
-        . '</option>' . PHP_EOL;
-    }
-
-   $sa818Form .= '</select>
-<div class="alert alert-info small py-1 mb-2">
-    <strong>Wide (25 kHz)</strong> : Meilleure sensibilité RX pour répéteurs<br>
-    <strong>Narrow (12.5 kHz)</strong> : Plus sélectif (zones urbaines)
-</div>
-<label for="sa_grp">Fréquence (MHz)</label>
-</div>
-<div class="form-floating mb-1">
-    <select id="sa_dev" class="form-select" aria-label="Mode FM (kHz)">
-        <option selected disabled>Sélectionnez une valeur</option>
-        <option ' . ((isset($lastPgmData['deviation']) && $lastPgmData['deviation'] == 0) ? 'selected' : null) . ' value="0">Narrow (12.5kHz)</option>
-        <option ' . (($lastPgmData['deviation'] == 1) ? 'selected' : null) . ' value="1">Wide (25kHz)</option>
-    </select>
-    <label for="sa_dev">Mode FM</label>
-</div>
-<div class="alert alert-info small py-1 mb-2">
-    <strong>Pour CTCSS RX</strong> : Préférez 67-85.4 Hz (meilleure qualité audio)
-</div>	
-<div class="form-floating mb-1">
-    <select id="sa_tpl_rx" class="form-select" aria-label="RX CTCSS (Hz)">
-        <option selected disabled>Sélectionnez une valeur</option>';
-				
-    /* Build RX CTCSS selects */
-    foreach ($ctcssVars as $key => $val) {
-        $selected = ($lastPgmData['ctcssRx'] == sprintf("%04d", $key)) ? 'selected' : null;
-        $sa818Form .= '<option value="' . sprintf("%04d", $key) . '"' . $selected . '>' . $val . '</option>' . PHP_EOL;
-    }
-    $sa818Form .= '</select>
-            <label for="sa_tpl_tx">RX CTCSS (Hz)</label>
-        </div>
-        <div class="form-floating mb-1">
-            <select id="sa_tpl_tx" class="form-select" aria-label="TX CTCSS (Hz)">
-                <option selected disabled>Sélectionnez une valeur</option>';
-    /* Build TX CTCSS selects */
-    foreach ($ctcssVars as $key => $val) {
-        $selected = ($lastPgmData['ctcssTx'] == sprintf("%04d", $key)) ? 'selected' : null;
-        $sa818Form .= '<option value="' . sprintf("%04d", $key) . '"' . $selected . '>' . $val . '</option>' . PHP_EOL;
-    }
-    $sa818Form .= '</select>
-            <label for="sa_tpl">TX CTCSS (Hz)</label>
-        </div>
-        <div class="form-floating mb-1">
-            <select id="sa_sql" class="form-select" aria-label="Squelch">
-                <option selected disabled>Sélectionnez une valeur</option>';
-    /* Generate squelch values */
-    for ($sq = 0; $sq <= 8; $sq += 1) {
-        $selected = ($lastPgmData['squelch'] == $sq) ? ' selected' : '';
-        $sa818Form .= '<option value="' . $sq . '"' . $selected . '>' . $sq . '</option>' . PHP_EOL;
-    }
-    $sa818Form .= '</select>
-            <label for="sa_sql">Squelch</label>
-        </div>
-        </div>
-        </div>
-        <div class="card mb-2">
-        <h4 class="card-header fs-5">Volume</h4>
-        <div class="card-body">
-        <div class="form-floating">
-            <select id="sa_vol" class="form-select" aria-label="Volume">
-                <option value="" selected>Aucun changement</option>';
-    /* Generate volume values */
-    for ($vol = 1; $vol <= 8; $vol += 1) {
-        $sa818Form .= '<option ' . (isset($lastPgmData['volume']) && ($lastPgmData['volume'] == $vol) ? 'selected' : null) . ' value="' . $vol . '">' . $vol . '</option>' . PHP_EOL;
-    }
-    $sa818Form .= '</select>
-            <label for="sa_vol">Volume</label>
-        </div>
-        </div>
-        </div>
-        <div class="card mb-2">
-        <h4 class="card-header fs-5">Filtre</h4>
-        <div class="card-body">
-        <div class="form-floating">
-        <select id="sa_flt" class="form-select" aria-label="Filter">' . PHP_EOL;
-    foreach ($filterOptions as $value => $label) {
-        $sa818Form .= '<option value="' . $value . '"' . ((isset($lastPgmData["filter"]) && ($lastPgmData["filter"] == $value)) ? " selected" : "") . '>' . $label . '</option>' . PHP_EOL;
-    }
-    $sa818Form .= '</select>
-            <label for="sa_flt">Filtre</label>
-        </div>
-        </div>
-        </div>';
-    $sa818Form .= '<div class="col alert alert-info mt-3 p-1 mx-auto text-center" role="alert">Remarque : Utilisation <b>ttyS' . $config['cfgTty'] . '</b> et <b>GPIO' . $config['cfgPttPin'] . '</b> pour le PTT. Vous pouvez les modifier dans la page de configuration.</div>' . PHP_EOL;
-    $sa818Form .= '<div class="d-flex justify-content-center my-3">
-            <button id="programm" type="button" class="btn btn-danger btn-lg">Sauvegarder</button>
-        </div>' . PHP_EOL;
-    $sa818Form .= '<div class="d-flex justify-content-center"><small class="d-inline-flex px-1 py-1 text-muted border rounded-3">';
-    $sa818Form .= 'Dernière programmation : ' . ((isset($lastPgmData['date'])) ? date('d-M-Y H:i:s', $lastPgmData['date']) : 'Unknown');
-    $sa818Form .= '</small></div>';
-    return $sa818Form;
-}
 
 /* APRS */
 function aprsForm($ajax = false)
@@ -1176,6 +966,28 @@ function ttyForm()
     $host     = parse_url($_SERVER['HTTP_HOST']);
     $host     = (empty($host['host']) ? $_SERVER['HTTP_HOST'] : $host['host']);
     $ttyFrame = '<h4 class="mt-2 alert alert-primary fw-bold">Terminal</h4>';
+    
+    // ✅ Ajout du style CSS pour l'animation clignotante (texte uniquement)
+    $ttyFrame .= '<style>
+        @keyframes blink-text-red-green {
+            0%   { color: #dc3545; }
+            50%  { color: #198754; }
+            100% { color: #dc3545; }
+        }
+        .blink-text {
+            animation: blink-text-red-green 1s infinite;
+        }
+    </style>';
+    
+    $ttyFrame .= '<div class="alert alert-secondary py-2 mb-2">';
+    $ttyFrame .= 'Login: <strong class="blink-text">root</strong> | ';
+    $ttyFrame .= 'Passwd: <strong class="blink-text">1234</strong> ';
+    $ttyFrame .= '<span class="badge bg-warning text-dark ms-2" style="cursor: help;" ';
+    $ttyFrame .= 'data-bs-toggle="tooltip" data-bs-placement="top" ';
+    $ttyFrame .= 'title="Pour changer le mot de passe, exécutez :<br><code>passwd</code><br>dans le terminal ci-dessous">';
+    $ttyFrame .= '⚠️ Changez le mot de passe !</span>';
+    $ttyFrame .= '</div>';
+    
     $ttyFrame .= '<div class="row">
         <div class="col-lg-12">
             <div class="card bg-light shadow border-0">
@@ -1236,10 +1048,10 @@ function cfgForm()
         'cfgPublicIp'   => 'IP externe',
         'cfgSvxStatus'  => 'Statut SVXLink',
         'cfgRefNodes'   => 'Nodes connectés',
-        'cfgCallsign'   => 'Indicatif',
+       // 'cfgCallsign'   => 'Indicatif',
         'cfgDTMF'       => 'DTMF Sender',
         'cfgKernel'     => 'Kernel version',
-        'cfgDetectSa'   => 'Détection du SA818',
+      // 'cfgDetectSa'   => 'Détection du SA818',
         'cfgFreeSpace'  => 'Espace libre',
         'cfgTempOffset' => 'Température du processeur',
     );
@@ -1352,7 +1164,7 @@ function cfgForm()
         // Check if RoLink version is capable of updates and if we're connected to the internet
         //if ($version['date'] > 20211204 && $isOnline) {
   //          $configData .= '<button id="updateDash" type="button" class="btn btn-primary btn-lg mx-2"> Mettre à jour le Dashboard</button>';
- $configData .= '<a href="/includes/update-dash.php" class="btn btn-primary btn-lg mx-2" onclick="return confirm(\'Confirmez-vous la mise à jour du Dashboard ?\');">Mettre à jour le Dashboard</a>';
+ //$configData .= '<a href="/includes/update-dash.php" class="btn btn-primary btn-lg mx-2" onclick="return confirm(\'Confirmez-vous la mise à jour du Dashboard ?\');">Mettre à jour le Dashboard</a>';
  //           $configData .= '<button id="updateRoLink" type="button" class="btn btn-warning btn-lg mx-2">RNFA update</button>';
  //       }
         $configData .= ($isOnline) ? null : '<button type="button" class="btn btn-dark btn-lg mx-2">Pas d’accès à Internet</button>';

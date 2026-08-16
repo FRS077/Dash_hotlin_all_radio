@@ -65,7 +65,7 @@ function getGPSDongle()
     if ($detected) {
         $status = 'background:lightgreen';
         $toggle = 'class="input-group-text collapsed dropdown-toggle" role="button"';
-        $gps    = 'Connected';
+        $gps    = 'Dongle connecté';
     }
     $data = '<div class="input-group mb-2">
         <span ' . $toggle . ' data-bs-toggle="collapse" data-bs-target="#gps" aria-expanded="false" aria-controls="gps" style="width: 6.5rem;' . $status . '">GPS</span>
@@ -147,42 +147,7 @@ function networking()
     return $returnData;
 }
 
-/* Display SA818 tty port & firmware */
-function sa818()
-{
-    $status  = null;
-    $version = version();
-    if (!$version || $version['date'] < 20230126) {
-        return;
-    }
-    $sa818    = 'Non détecté';
-    $toggle   = 'class="input-group-text"';
-    $detected = false;
-    $saDetect = sa8x8Detect();
-    if (is_array($saDetect)) {
-        $status   = 'background:lightgreen';
-        $toggle   = 'class="input-group-text collapsed dropdown-toggle" role="button"';
-        $detected = true;
-        $sa818    = 'Détecté';
-    }
-    $data = '<div class="input-group mb-2">
-        <span ' . $toggle . ' data-bs-toggle="collapse" data-bs-target="#sa818" aria-expanded="false" aria-controls="sa818" style="width: 6.5rem;' . $status . '">SA818</span>
-        <input type="text" class="form-control" placeholder="' . $sa818 . '" readonly>
-    </div>';
-    $data .= ($detected) ? '<div id="sa818" class="accordion-collapse collapse">
-        <div class="accordion-body">
-            <div class="input-group mb-1">
-                <span class="input-group-text" style="width: 6rem;">Port série</span>
-                <span class="input-group-text" style="width: 8rem;">' . $saDetect['port'] . '</span>
-            </div>
-            <div class="input-group mb-1">
-                <span class="input-group-text" style="width: 6rem;">Firmware</span>
-                <span class="input-group-text" style="width: 8rem;">' . str_replace("+VERSION:", "", trim($saDetect['version'])) . '</span>
-            </div>
-        </div>
-    </div>' : null;
-    return $data;
-}
+
 
 /* Get Hostname */
 function hostName()
@@ -310,53 +275,17 @@ function getPublicIP()
 {
     $ip     = 'Not available';
     $status = 'color:white;background:red';
-    $toggle = 'class="input-group-text" role="button"';
     $gotIP  = getExtIp();
     if ($gotIP) {
         $ip     = $gotIP;
         $status = 'background:lightgreen';
-        $toggle = 'class="input-group-text collapsed dropdown-toggle" role="button"';
     }
+
     $data = '<div class="input-group mb-2">
-        <span data-bs-toggle="tooltip" title="Cliquez pour révéler la <b>performance du réseau</b> outil">
-            <span ' . $toggle . ' data-bs-toggle="collapse" data-bs-target="#netPerf" aria-expanded="false" aria-controls="netPerf" style="width: 6.5rem;' . $status . '">IP externe</span>
-        </span>
+        <span class="input-group-text" style="width: 6.5rem;' . $status . '">IP externe</span>
         <input type="text" class="form-control" placeholder="' . $ip . '" readonly>
     </div>';
-    $data .= ($gotIP) ? '<div id="netPerf" class="accordion-collapse collapse">
-        <div class="accordion-body">
-            <div class="row">
-                <div class="col text-center pb-2">
-                    <button type="button" class="btn btn-info col-sm px-2" id="latencyCheck"><i class="icon-timer px-2" aria-hidden="true"></i>Exécuter un test</button>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm">
-                    <label for="tcp_bw" class="form-control-sm col-form-label">TCP Bandwidth</label>
-                    <input id="tcp_bw" type="text" class="form-control text-center" placeholder="..." readonly>
-                </div>
-                <div class="col-sm">
-                    <label for="tcp_lat" class="form-control-sm col-form-label">TCP Latency</label>
-                    <input id="tcp_lat" type="text" class="form-control text-center" placeholder="..." readonly>
-                </div>
-                <div class="col-sm">
-                    <label for="udp_sbw" class="form-control-sm col-form-label">UDP TX Bandwidth</label>
-                    <input id="udp_sbw" type="text" class="form-control text-center" placeholder="..." readonly>
-                </div>
-                <div class="col-sm">
-                    <label for="udp_rbw" class="form-control-sm col-form-label">UDP RX Bandwidth</label>
-                    <input id="udp_rbw" type="text" class="form-control text-center" placeholder="..." readonly>
-                </div>
-                <div class="col-sm">
-                    <label for="udp_lat" class="form-control-sm col-form-label">UDP Latency</label>
-                    <input id="udp_lat" type="text" class="form-control text-center" placeholder="..." readonly>
-                </div>
-            </div>
-            <div class="pt-3 text-center">
-                <small class="d-inline-flex px-2 py-1 font-monospace text-muted border rounded-3">Des performances optimales sont obtenues lorsque la bande passante est supérieure à 350 Ko/s et la latence est inférieure à 150 ms</small>
-            </div>
-        </div>
-    </div>' : null;
+
     return $data;
 }
 
@@ -382,44 +311,29 @@ function getSVXLinkStatus($ext = 0)
 /* Obtenir l'adresse du Reflecteur */
 function getReflector($ext = 0)
 {
-    $config    = include __DIR__ . '/../config.php';
-    $cfgFile   = '/opt/rolink/conf/rolink.conf';
-    $conStatus = $stateColor = $prevStatus = '';
+    $config  = include __DIR__ . '/../config.php';
+    $cfgFile = '/opt/rolink/conf/rolink.conf';
     
-    // CORRIGÉ: enlever les \\ inutiles
     if (is_file($cfgFile)) {
         preg_match('/HOST=(\S+)/', file_get_contents($cfgFile), $reply);
     }
     $refHost = (!empty($reply)) ? $reply[1] : 'Non disponible';
     
-    // Analyse logs avec regex corrigée
-    preg_match_all('/(Could not open GPIO|Disconnected|Connection established)/', file_get_contents('/tmp/svxlink.log'), $logData);
+    // ✅ VÉRIFICATION RÉELLE : Est-ce qu'il y a une connexion TCP ESTABLISHED vers le reflector ?
+    $refIp = $refHost;
+    exec("/usr/bin/netstat -an 2>/dev/null | /usr/bin/grep ':5300' | /usr/bin/grep -c 'ESTABLISHED'", $reply);
+    $isConnected = (!empty($reply[0]) && $reply[0] > 0);
     
-    if (!empty($logData) && getSVXLinkStatus(1)) {
-        $statusData = (isset($logData[0][array_key_last($logData[0]) - 1])) ? $logData[0][array_key_last($logData[0]) - 1] : null;
-        $prevStatus = (count($logData[0]) > 1) ? $statusData : null;
-        $conStatus  = ($prevStatus == 'Could not open GPIO') ? 'GPIO' : $logData[0][array_key_last($logData[0])];
-        
-        switch ($conStatus) {
-            case "Connexion établie":
-            case "Connection established":
-            case "established":
-                $stateColor = 'background:lightgreen;';
-                $refHost    = 'Connecté';  // ✅ Affichage "Connecté" au lieu IP
-                break;
-            case "Déconnecté":
-            case "Disconnected":
-                $stateColor = 'background:tomato;';
-                $refHost    = 'Déconnecté';  // ✅ Rouge
-                break;
-            case "Could not open GPIO":
-                $stateColor = 'background:red;';
-                $refHost    = 'Vérifiez GPIO !';
-                break;
-        }
+    // Alternative avec ss (plus moderne)
+    if (!$isConnected) {
+        exec("/usr/bin/ss -tn 2>/dev/null | /usr/bin/grep -c 'ESTAB.*:5300'", $reply);
+        $isConnected = (!empty($reply[0]) && $reply[0] > 0);
     }
     
-    $showNodes = ($config['cfgRefNodes'] == 'true' && strpos($conStatus, 'established') !== false) ? 
+    $stateColor = $isConnected ? 'background:lightgreen;' : 'background:tomato;';
+    $refHost    = $isConnected ? 'Connecté' : 'Déconnecté';
+    
+    $showNodes = ($config['cfgRefNodes'] == 'true' && $isConnected) ? 
         ' collapsed dropdown-toggle" role="button" data-bs-toggle="collapse" data-bs-target="#refStations" aria-expanded="false" aria-controls="refStations"' : '"';
     
     return '<div class="input-group mb-2">

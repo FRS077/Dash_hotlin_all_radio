@@ -1,0 +1,14 @@
+{
+    "reflector": "f62dmr.fr",
+    "port": "5300",
+    "callsign": "CEM43-RE",
+    "key": "USER",
+    "beacon": "CEM43",
+    "bitrate": "8000",
+    "type": "nod portabil",
+    "shortIdent": "30",
+    "longIdent": "30",
+    "rogerBeep": "1",
+    "connectionStatus": "1",
+    "defaultTg": "59"
+}
