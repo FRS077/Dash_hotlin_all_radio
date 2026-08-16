@@ -125,9 +125,13 @@ $(document).ready(function () {
       }
     };
     source.onmessage = function (event) {
-  var data = JSON.parse(event.data);
-  handleEventData(data);
-};
+      var data = JSON.parse(event.data);
+      handleEventData(data);
+      $('.talker').addClass('newEvent');
+      setTimeout(function () {
+        $('.talker').removeClass('newEvent')
+      }, 100);
+    };
 
     function handleEventData(data) {
       if (data['rx']) {
@@ -172,11 +176,7 @@ $(document).ready(function () {
             hour12: false
           });
         }
-       $('#onair').html(
-  '🎙️ <strong>' + data['tn'] + '</strong>' +
-  ' <span style="opacity:.55">—</span> ' +
-  '<span style="font-size:.9em">🕒 Heure : ' + ts + '</span>'
-);
+        $('#onair').html(data['tn'] + " (" + ts + ")");
         $('#onair').removeClass('badge-danger').addClass('badge-secondary').css('opacity', '35%');
       }
       if (data['cl']) {

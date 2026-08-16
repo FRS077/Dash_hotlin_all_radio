@@ -278,7 +278,7 @@ Initialisation...
 
         $htmlOutput = '
         <h4 class="m-2 mt-2 alert alert-success fw-bold talker">' .
-            ($detect->isMobile() ? '&nbsp;' : 'Statut') .
+            ($detect->isMobile() ? '&nbsp;' : '📡 Dernier trafic') .
             '<span id="onair" class="badge position-absolute top-50 start-50 translate-middle"></span>
         </h4>
 
