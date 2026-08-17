@@ -675,8 +675,8 @@ function aprsForm($ajax = false)
     $report   = 0;
     if (preg_match('/IGLOGIN (\S+)/', file_get_contents('/etc/direwolf.conf'), $matches)) {
         $callsign   = $matches[1];
-        $aprsfiLink = (empty($callsign) && $callsign == 'N0CALL-15') ? null : '<span data-bs-toggle="tooltip" title="View ' . $callsign . ' on aprs.fi" class="input-group-text">
-            <a class="mx-2" href="https://aprs.fi/#!call=' . $callsign . '" target="_blank"><i class="icon-exit_to_app"></i></a>
+        $aprsfiLink = (empty($callsign) && $callsign == 'N0CALL-15') ? null : '<span data-bs-toggle="tooltip" title="View ' . $callsign . ' on cbaprs" class="input-group-text">
+            <a class="mx-2" href="http://cbaprs.at/#!call=' . $callsign . '" target="_blank"><i class="icon-exit_to_app"></i></a>
         </span>';
     }
     $aprsForm = '<h4 class="mt-2 alert alert-primary fw-bold">APRS</h4>';
