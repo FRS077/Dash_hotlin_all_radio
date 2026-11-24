@@ -418,7 +418,7 @@ Initialisation...
                 <a class="<?php echo ($page == 'cfg') ? 'active' : ''; ?> list-group-item list-group-item-action list-group-item-light p-3" href="./?p=cfg">⚙️ Config</a>
                 <a class="<?php echo ($page == 'update' || $page == 'update-run') ? 'active' : ''; ?> list-group-item list-group-item-action list-group-item-light p-3" href="./?p=update">🔄 Mise à jour</a>
                 <a class="<?php echo ($page == 'nod') ? 'active' : ''; ?> list-group-item list-group-item-action list-group-item-light p-3" href="./?p=nod">ℹ️ Node Info</a>
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="https://www.f62dmr.fr/index.php" target="_blank">🌐 Dashboard RNFA</a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="https://www.rnfa.fr" target="_blank">🌐 Dashboard RNFA</a>
                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="https://www.facebook.com/groups/1067389751809869" target="_blank">📘 Groupe Facebook</a>
             </div>
         </div>
@@ -450,7 +450,7 @@ Initialisation...
                             <li class="nav-item"><a class="<?php echo ($page == 'cfg') ? 'active p-2' : ''; ?> nav-link" href="./?p=cfg">⚙️ Config</a></li>
                             <li class="nav-item"><a class="<?php echo ($page == 'update' || $page == 'update-run') ? 'active p-2' : ''; ?> nav-link" href="./?p=update">🔄 Mise à jour</a></li>
                             <li class="nav-item"><a class="<?php echo ($page == 'nod') ? 'active p-2' : ''; ?> nav-link" href="./?p=nod">ℹ️ Node Info</a></li>
-                            <li class="nav-item"><a class="nav-link p-2" href="https://www.f62dmr.fr/index.php" target="_blank">🌐 Dashboard du RNFA</a></li>
+                            <li class="nav-item"><a class="nav-link p-2" href="https://www.rnfa.fr" target="_blank">🌐 Dashboard du RNFA</a></li>
                             <li class="nav-item"><a class="nav-link p-2" href="https://www.facebook.com/groups/1067389751809869" target="_blank">📘 Groupe Facebook</a></li>
                         </ul>
                     </div>
